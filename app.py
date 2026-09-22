@@ -390,16 +390,26 @@ with st.sidebar:
     doc_count = get_collection_stats().get('document_count', 0) if has_index else 0
     llm_info = check_llm_status()
 
-    st.markdown("""
+    vdb_status_color = "#10B981" if has_index else "#F59E0B"
+    vdb_status_bg = "rgba(16, 185, 129, 0.1)" if has_index else "rgba(245, 158, 11, 0.1)"
+    vdb_status_border = "rgba(16, 185, 129, 0.3)" if has_index else "rgba(245, 158, 11, 0.3)"
+    vdb_status_text = f"● {doc_count} Indexed" if has_index else "● Building..."
+
+    llm_status_color = "#6366F1" if llm_info["key_set"] else "#EF4444"
+    llm_status_bg = "rgba(99, 102, 241, 0.1)" if llm_info["key_set"] else "rgba(239, 68, 68, 0.1)"
+    llm_status_border = "rgba(99, 102, 241, 0.3)" if llm_info["key_set"] else "rgba(239, 68, 68, 0.3)"
+    llm_status_text = f"{llm_info['provider'].upper()} Active" if llm_info["key_set"] else "Key Missing"
+
+    st.markdown(f"""
         <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 0.9rem; margin-bottom: 1.2rem;">
             <div style="font-size: 0.72rem; color: #94A3B8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 0.6rem;">System Diagnostics</div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
                 <span style="font-size: 0.85rem; color: #E2E8F0;">Vector DB</span>
-                <span style="font-size: 0.75rem; font-weight: 700; color: #10B981; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(16, 185, 129, 0.3);">● 220 Indexed</span>
+                <span style="font-size: 0.75rem; font-weight: 700; color: {vdb_status_color}; background: {vdb_status_bg}; padding: 2px 8px; border-radius: 999px; border: 1px solid {vdb_status_border};">{vdb_status_text}</span>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
                 <span style="font-size: 0.85rem; color: #E2E8F0;">LLM Provider</span>
-                <span style="font-size: 0.75rem; font-weight: 700; color: #6366F1; background: rgba(99, 102, 241, 0.1); padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(99, 102, 241, 0.3);">Groq Active</span>
+                <span style="font-size: 0.75rem; font-weight: 700; color: {llm_status_color}; background: {llm_status_bg}; padding: 2px 8px; border-radius: 999px; border: 1px solid {llm_status_border};">{llm_status_text}</span>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="font-size: 0.85rem; color: #E2E8F0;">Embeddings</span>
@@ -407,6 +417,13 @@ with st.sidebar:
             </div>
         </div>
     """, unsafe_allow_html=True)
+
+    if not llm_info["key_set"]:
+        st.warning("⚠️ Groq API key not detected in environment or st.secrets.")
+        manual_key = st.text_input("Enter Groq Key:", type="password", placeholder="gsk_...", key="manual_api_key")
+        if manual_key:
+            os.environ["GROQ_API_KEY"] = manual_key.strip()
+            st.rerun()
 
     st.markdown("**Quick Recruiter Queries:**")
     quick_queries = [
@@ -444,45 +461,38 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# Database check & Cloud Deployment Auto-Init
+# Automatic Cloud Auto-Init (Builds index seamlessly without requiring button clicks)
 if not has_index:
-    st.warning("⚠️ **Vector Database Not Initialized**")
-    st.markdown("""
-        The ChromaDB vector database is currently unpopulated on this environment.
-        You can build the index directly by clicking below.
-    """)
-    
     if DATA_PATH.exists():
-        if st.button("🚀 Initialize & Build Vector Index (220 Resumes)", type="primary"):
-            with st.spinner("Parsing resumes and generating embeddings (takes ~15 seconds)..."):
-                from src.data_loader import load_raw_data
-                from src.resume_parser import parse_all_resumes
-                from src.vector_store import build_index
-                
-                records = load_raw_data(DATA_PATH)
-                profs = parse_all_resumes(records)
-                build_index(profs, rebuild=True)
-                st.success("✅ Index built successfully! Reloading application...")
-                st.rerun()
+        with st.status("⚡ Initializing Vector Database from resumes dataset (one-time setup, ~12s)...", expanded=True) as status:
+            st.write("1. Reading resume entities...")
+            from src.data_loader import load_raw_data
+            from src.resume_parser import parse_all_resumes
+            from src.vector_store import build_index
+            
+            records = load_raw_data(DATA_PATH)
+            st.write(f"2. Parsing {len(records)} candidate profiles...")
+            profs = parse_all_resumes(records)
+            st.write("3. Generating dense embeddings (all-MiniLM-L6-v2) and persisting ChromaDB...")
+            build_index(profs, rebuild=True)
+            status.update(label="✅ Vector Database Ready!", state="complete", expanded=False)
+            st.rerun()
     else:
-        st.info("📁 You can upload `Entity Recognition in Resumes.json` directly to initialize the vector database:")
+        st.info("📁 Upload `Entity Recognition in Resumes.json` to initialize the database:")
         uploaded = st.file_uploader("Upload Resumes JSON", type=["json"], label_visibility="collapsed")
         if uploaded is not None:
             DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
             with open(DATA_PATH, "wb") as f:
                 f.write(uploaded.getbuffer())
-            st.success("✅ File uploaded! Initializing vector database...")
             with st.spinner("Building index..."):
                 from src.data_loader import load_raw_data
                 from src.resume_parser import parse_all_resumes
                 from src.vector_store import build_index
-                
                 records = load_raw_data(DATA_PATH)
                 profs = parse_all_resumes(records)
                 build_index(profs, rebuild=True)
-                st.success("✅ Vector database ready! Reloading...")
                 st.rerun()
-    st.stop()
+        st.stop()
 
 # Initialize components
 _ = load_cached_embedding_model()

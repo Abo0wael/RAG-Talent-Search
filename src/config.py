@@ -36,27 +36,44 @@ EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 5                     # Default number of candidates to retrieve
 COLLECTION_NAME = "resumes"   # ChromaDB collection name
 
+def _get_secret(key: str, default: str | None = None) -> str | None:
+    """Get secret from os.environ, falling back to st.secrets for Streamlit Cloud."""
+    val = os.getenv(key)
+    if val and val != f"your_{key.lower()}_here":
+        return val
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets") and key in st.secrets:
+            s_val = st.secrets[key]
+            if s_val:
+                os.environ[key] = s_val
+                return s_val
+    except Exception:
+        pass
+    return default
+
+
 # ---------------------------------------------------------------------------
 # LLM Provider Configuration
 # ---------------------------------------------------------------------------
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").lower()
+LLM_PROVIDER = _get_secret("LLM_PROVIDER", "groq").lower()
 
 # Provider-specific models
 LLM_MODELS = {
-    "groq": os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b"),
-    "openai": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-    "google": os.getenv("GOOGLE_MODEL", "gemini-1.5-flash"),
+    "groq": _get_secret("GROQ_MODEL", "qwen/qwen3.8-27b"),
+    "openai": _get_secret("OPENAI_MODEL", "gpt-4o-mini"),
+    "google": _get_secret("GOOGLE_MODEL", "gemini-1.5-flash"),
 }
 
 LLM_MODEL = LLM_MODELS.get(LLM_PROVIDER, "qwen/qwen3.8-27b")
 
-# API Keys (loaded from environment)
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+# API Keys (loaded from environment or st.secrets on cloud)
+GROQ_API_KEY = _get_secret("GROQ_API_KEY")
+OPENAI_API_KEY = _get_secret("OPENAI_API_KEY")
+GOOGLE_API_KEY = _get_secret("GOOGLE_API_KEY")
 
 # LLM Temperature
-LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
+LLM_TEMPERATURE = float(_get_secret("LLM_TEMPERATURE", "0.1"))
 
 # ---------------------------------------------------------------------------
 # Miscellaneous
