@@ -46,19 +46,35 @@ def load_raw_data(data_path: str | Path | None = None) -> list[dict]:
     errors = []
 
     with open(path, "r", encoding="utf-8") as f:
-        for line_num, line in enumerate(f, 1):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                record = json.loads(line)
-                # Validate minimal structure
-                if "content" in record and record["content"]:
-                    records.append(record)
-                else:
-                    errors.append(f"Line {line_num}: missing or empty 'content' field")
-            except json.JSONDecodeError as e:
-                errors.append(f"Line {line_num}: invalid JSON - {e}")
+        content = f.read().strip()
+
+    # Strategy 1: Try parsing as standard JSON Array [ {...}, {...} ]
+    if content.startswith("[") and content.endswith("]"):
+        try:
+            parsed = json.loads(content)
+            if isinstance(parsed, list):
+                for item in parsed:
+                    if isinstance(item, dict) and item.get("content"):
+                        records.append(item)
+                if records:
+                    print(f"[DataLoader] Successfully loaded {len(records)} resumes from {path.name} (JSON Array format)")
+                    return records
+        except Exception:
+            pass
+
+    # Strategy 2: JSON Lines (DataTurks format - one JSON object per line)
+    for line_num, line in enumerate(content.splitlines(), 1):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            record = json.loads(line)
+            if isinstance(record, dict) and record.get("content"):
+                records.append(record)
+            else:
+                errors.append(f"Line {line_num}: missing or empty 'content' field")
+        except json.JSONDecodeError as e:
+            errors.append(f"Line {line_num}: invalid JSON - {e}")
 
     if errors:
         print(f"[DataLoader] Warning: {len(errors)} lines had issues:")
