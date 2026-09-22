@@ -1,12 +1,16 @@
 # 💼 RAG-Powered Talent Search Engine
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://rag-talent-search-cboh3ps2af9iz4bgmwjhrr.streamlit.app)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Streamlit_Cloud-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://rag-talent-search-cboh3ps2af9iz4bgmwjhrr.streamlit.app)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![LangChain](https://img.shields.io/badge/LangChain-v0.3-1C3C3C?logo=langchain&logoColor=white)](https://www.langchain.com/)
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector_Store-FF6F61)](https://www.trychroma.com/)
 [![Groq](https://img.shields.io/badge/Groq-High_Speed_AI-F55036)](https://groq.com/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-UI-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![Elevvo AI Internship](https://img.shields.io/badge/Elevvo-AI_Internship-6366F1?style=flat&logo=rocket)](https://github.com/Abo0wael/RAG-Talent-Search)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> 🌐 **Live Web Application**: Try the deployed recruiter search engine directly at:  
+> 👉 **[https://rag-talent-search-cboh3ps2af9iz4bgmwjhrr.streamlit.app](https://rag-talent-search-cboh3ps2af9iz4bgmwjhrr.streamlit.app)**
 
 A production-grade **Retrieval-Augmented Generation (RAG)** pipeline and interactive recruiter search engine built for semantic candidate discovery. The system enables recruiters to express job requirements in natural language, semantically retrieves matching candidates from a persistent ChromaDB vector store, and leverages an LLM to generate evidence-backed, grounded fit evaluations.
 
@@ -384,7 +388,7 @@ This software implementation is licensed under the [MIT License](LICENSE). The u
 <div align="center">
 
 ### **Ahmed Wael**
-*AI / NLP Engineer • Elevvo AI Intern*
+*AI / NLP Engineer • Elevvo AI Intern* 
 
 [![GitHub](https://img.shields.io/badge/GitHub-Abo0wael-181717?style=flat&logo=github)](https://github.com/Abo0wael)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Ahmed%20Wael-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/ahmed-wael-9a6a5938a)
