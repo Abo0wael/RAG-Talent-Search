@@ -384,7 +384,7 @@ This software implementation is licensed under the [MIT License](LICENSE). The u
 <div align="center">
 
 ### **Ahmed Wael**
-*AI / Software Engineer • Elevvo AI Intern*
+*AI / NLP Engineer • Elevvo AI Intern*
 
 [![GitHub](https://img.shields.io/badge/GitHub-Abo0wael-181717?style=flat&logo=github)](https://github.com/Abo0wael)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Ahmed%20Wael-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/ahmed-wael-9a6a5938a)
