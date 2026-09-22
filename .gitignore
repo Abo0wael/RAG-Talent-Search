@@ -40,15 +40,6 @@ env/
 # Environment variables
 .env
 
-# Dataset (do NOT commit - download from Kaggle)
-data/Entity Recognition in Resumes.json
-data/*.json
-!data/.gitkeep
-
-# Vector store (generated, do not commit)
-vectorstore/
-!vectorstore/.gitkeep
-
 # Model cache
 models/
 .cache/

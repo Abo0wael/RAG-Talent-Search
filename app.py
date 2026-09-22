@@ -465,8 +465,23 @@ if not has_index:
                 st.success("✅ Index built successfully! Reloading application...")
                 st.rerun()
     else:
-        st.error(f"Dataset file missing at: `{DATA_PATH}`")
-        st.info("Please place `Entity Recognition in Resumes.json` in the `data/` directory.")
+        st.info("📁 You can upload `Entity Recognition in Resumes.json` directly to initialize the vector database:")
+        uploaded = st.file_uploader("Upload Resumes JSON", type=["json"], label_visibility="collapsed")
+        if uploaded is not None:
+            DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+            with open(DATA_PATH, "wb") as f:
+                f.write(uploaded.getbuffer())
+            st.success("✅ File uploaded! Initializing vector database...")
+            with st.spinner("Building index..."):
+                from src.data_loader import load_raw_data
+                from src.resume_parser import parse_all_resumes
+                from src.vector_store import build_index
+                
+                records = load_raw_data(DATA_PATH)
+                profs = parse_all_resumes(records)
+                build_index(profs, rebuild=True)
+                st.success("✅ Vector database ready! Reloading...")
+                st.rerun()
     st.stop()
 
 # Initialize components
