@@ -1,0 +1,72 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+
+# Dataset (do NOT commit - download from Kaggle)
+data/Entity Recognition in Resumes.json
+data/*.json
+!data/.gitkeep
+
+# Vector store (generated, do not commit)
+vectorstore/
+!vectorstore/.gitkeep
+
+# Model cache
+models/
+.cache/
+
+# Outputs (generated)
+outputs/figures/*.png
+outputs/figures/*.jpg
+outputs/figures/*.svg
+outputs/evaluation/*.json
+outputs/evaluation/*.csv
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log

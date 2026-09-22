@@ -1,0 +1,36 @@
+# =============================================================================
+# RAG Talent Search Engine - Dependencies
+# =============================================================================
+
+# --- Core ---
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-core>=0.3.0
+
+# --- LLM Providers ---
+langchain-groq>=0.2.0
+langchain-openai>=0.2.0
+langchain-google-genai>=2.0.0
+
+# --- Embeddings ---
+sentence-transformers>=3.0.0
+
+# --- Vector Database ---
+chromadb>=0.5.0
+
+# --- Data Processing ---
+pandas>=2.0.0
+numpy>=1.24.0
+
+# --- Web UI ---
+streamlit>=1.38.0
+
+# --- Visualization ---
+matplotlib>=3.7.0
+plotly>=5.15.0
+
+# --- Environment ---
+python-dotenv>=1.0.0
+
+# --- Utilities ---
+tqdm>=4.65.0
